@@ -1,0 +1,30 @@
+{{>layout/header}}
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1cf217ec8aafecab4e76cda6322c91b7"></script>
+<div id="map" style="width:500px;height:400px;"></div>
+
+<div>
+    <span> hi </span>
+</div>
+
+
+<script type="text/javascript" src="/js/app/map.js"></script>
+
+<script>
+
+    $.getJSON("/geo/TL_SCCO_SIG.json", function(geojson) {
+
+        var data = geojson.features;
+        var coordinates = [];    //좌표 저장할 배열
+        var name = '';            //행정 구 이름
+        console.log(data);
+        $.each(data, function(index, val) {
+
+            coordinates = val.geometry.coordinates;
+            name = val.properties.SIG_KOR_NM;
+
+            displayArea(coordinates, name);
+
+        })
+    })
+</script>
+{{>layout/footer}}
