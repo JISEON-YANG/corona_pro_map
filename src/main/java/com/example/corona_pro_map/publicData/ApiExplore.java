@@ -1,4 +1,5 @@
 package com.example.corona_pro_map.publicData;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,10 +37,10 @@ public class ApiExplore {
             e.printStackTrace();
         }
         JSONObject jsonObject = XML.toJSONObject(result.toString());
+        JSONArray jsonObject1 = jsonObject.getJSONObject("response").getJSONObject("body").getJSONObject("items").getJSONArray("item");
+        System.out.println("jsonObject.toString() = " + jsonObject1.toString());
 
-        System.out.println("jsonObject.toString() = " + jsonObject.toString());
-
-        return jsonObject.toString();
+        return jsonObject1.toString();
     }
 
 }

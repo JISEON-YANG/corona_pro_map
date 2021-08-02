@@ -1,100 +1,145 @@
 {{>layout/header}}
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1cf217ec8aafecab4e76cda6322c91b7"></script>
-<script src="https://d3js.org/d3.v7.min.js"></script>
-<script>
-
-    const svg = d3
-            .select(".canvas")
-            .append("svg")
-            .attr("width", 600)
-            .attr("height", 600);
-
-    // 차트에 여백 만들기
-    const margin = { top: 20, right: 20, bottom: 100, left: 100 };
-    const graphWidth = 600 - margin.left - margin.right;
-    const graphHeight = 600 - margin.top - margin.bottom;
-
-    const graph = svg
-            .append("g")
-            .attr("width", graphWidth)
-            .attr("height", graphHeight)
-            .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-    const xAxisGroup = graph
-            .append("g")
-            .attr("transform", `translate(0, ${graphHeight})`); // x축 아래로 translate
-    const yAxisGroup = graph.append("g");
-
-    // Data 적용해서 차트 만들기
-    d3.json("/geo/menu.json").then(data => {
-        const rects = graph.selectAll("rect").data(data);
-
-        const y = d3
-                .scaleLinear() // 한계치 설정
-                .domain([0, d3.max(data, d => d.orders)])
-                .range([graphHeight, 0]);
-
-        const min = d3.min(data, d => d.orders); // 가장 작은 수 반환
-        const max = d3.max(data, d => d.orders); // 가장 큰 수 반환
-        const extent = d3.extent(data, d => d.orders); // [min, max] 반환
-
-        const x = d3
-                .scaleBand()
-                .domain(data.map(item => item.name)) // data 각각의 이름 설정
-                .range([0, 500])
-                .paddingInner(0.2) // 0.2 padding
-                .paddingOuter(0.2);
-
-        rects
-                .attr("width", x.bandwidth)
-                .attr("height", d => graphHeight - y(d.orders)) // data의 orders 값 적용
-                .attr("fill", "orange")
-                .attr("x", d => x(d.name)) // data index 값 * 70
-                .attr("y", d => y(d.orders));
-
-        // 반환되지 못한 나머지 data 가상 DOM으로 생성
-        rects
-                .enter()
-                .append("rect")
-                .attr("width", x.bandwidth)
-                .attr("height", d => graphHeight - y(d.orders))
-                .attr("fill", "orange")
-                .attr("x", d => x(d.name))
-                .attr("y", d => y(d.orders)); // 위에 있는 그래프 뒤집기
-
-        // x축 y축 (axis) 생성
-        const xAxis = d3.axisBottom(x);
-        const yAxis = d3
-                .axisLeft(y)
-                .ticks(3) //ticks 는 y축 눈금 갯수
-                .tickFormat(d => d + " orders"); // 눈금 값 설정
-
-        // 축 적용
-        xAxisGroup.call(xAxis);
-        yAxisGroup.call(yAxis);
-
-        xAxisGroup
-                .selectAll("text") // x축 눈금 값. text 선택
-                .attr("transform", "rotate(-40)")
-                .attr("text-anchor", "end")
-                .attr("fill", "orange");
-    });
-
-
-
-</script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<style>
+    .canvas {width: 100%; height: 100%;}
+</style>
 <div id="map" style="width:500px;height:400px;"></div>
-<div class="canvas"></div>
+<svg class="canvas"></svg>
 <div>
     <span> hi  test commit</span>
 </div>
 
 
-<script type="text/javascript" src="/js/app/map.js"></script>
-<script type="text/javascript" src="/js/app/chart.js"></script>
+<!--<script type="text/javascript" src="/js/app/map.js"></script>-->
+<!--<script type="text/javascript" src="/js/app/chart.js"></script>-->
 
 <script>
 
+    // SETUP
+
+    var svg = d3.select(".canvas"),
+            margin = { top: 20, right: 20, bottom: 30, left: 40 },
+            x = d3.scaleBand().padding(0.1),
+            y = d3.scaleLinear(),
+            theData = undefined;
+
+    var g = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    g.append("g")
+            .attr("class", "axis axis--x");
+
+    g.append("g")
+            .attr("class", "axis axis--y");
+
+    g.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("수");
+
+    // DRAWING
+
+    function draw() {
+
+        var bounds = svg.node().getBoundingClientRect(),
+                width = bounds.width - margin.left - margin.right,
+                height = bounds.height - margin.top - margin.bottom;
+
+        x.rangeRound([0, width]);
+        y.rangeRound([height, 0]);
+
+        g.select(".axis--x")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+
+        g.select(".axis--y")
+                .call(d3.axisLeft(y).ticks(10, "%"));
+
+        var bars = g.selectAll(".bar")
+                .data(theData);
+        // ENTER
+        bars
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function (d) { return x(d.gubun); })
+                .attr("y", function (d) { return y(d.localOccCnt); })
+                .attr("width", x.bandwidth())
+                .attr("height", function (d) { return height - y(d.localOccCnt); });
+
+        // UPDATE
+        bars.attr("x", function (d) { return x(d.gubun); })
+                .attr("y", function (d) { return y(d.localOccCnt); })
+                .attr("width", x.bandwidth())
+                .attr("height", function (d) { return height - y(d.localOccCnt); });
+
+        // EXIT
+        bars.exit()
+                .remove();
+
+    }
+
+    // LOADING DATA
+    var data;
+    function getData(){
+        $.ajax({
+            type: 'GET',
+            url: '/jsonapi',
+            dataType: 'json',
+            contentType:'application/json; charset=utf-8',
+            success: function(obj){
+                data = obj;
+                // console.log(data);
+                loadData(data);
+            }
+        });
+    }
+
+    function loadData(jsonData) {
+        // d3.json()
+        d3.json("/jsonapi", function (error, data) {
+            if (error) throw error;
+            // data.forEach(function(d) {
+            //     if(d.gubun!="검역" && d.gubun!="합계"){
+            //         d.gubun = d.gubun;
+            //         d.localOccCnt = +d.localOccCnt;
+            //     }
+            // });
+            theData = data;
+            x.domain(theData.map(function (d) {
+                if(d.gubun!="검역" && d.gubun!="합계")
+                    return d.gubun;
+            }));
+            y.domain([0, d3.max(theData, function (d) {
+                if(d.gubun!="검역" && d.gubun!="합계")
+                    return d.localOccCnt;
+            })]);
+            draw();
+        });
+        // d3.tsv(tsvFile, function (d) {
+        //     d.frequency = +d.frequency;
+        //     return d;
+        //
+        // }, function (error, data) {
+        //     if (error) throw error;
+        //
+        //     theData = data;
+        //
+        //     x.domain(theData.map(function (d) { return d.letter; }));
+        //     y.domain([0, d3.max(theData, function (d) { return d.frequency; })]);
+        //
+        //     draw();
+        //
+        // });
+    }
+
+    // START!
+
+    window.addEventListener("resize", draw);
+    // getData();
+    loadData(data);
 
 </script>
 {{>layout/footer}}

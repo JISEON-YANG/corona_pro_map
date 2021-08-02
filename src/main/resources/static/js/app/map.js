@@ -33,7 +33,7 @@ $(document).ready(function() {
             var data = geojson.features;
             var coordinates = [];    //좌표 저장할 배열
             var name = '';            //행정 구 이름
-            console.log(data);
+            // console.log(data);
             $.each(data, function(index, val) {
                 coordinates = val.geometry.coordinates;
                 if(jsonData == URL_CTPRVN){
@@ -128,12 +128,12 @@ $(document).ready(function() {
 
         if(level > 10){
             var message = '현재 지도 레벨은 ' + level + ' 입니다';
-            console.log("message" + message);
+            // console.log("message" + message);
             fnloadPolygon(polygons_CTPRVN, map);
             fnloadPolygon(polygons_SIG, null);
         }else{
             var message = '현재 지도 레벨은 ' + level + ' 입니다';
-            console.log("messagezzzzzzzzzzz" + message);
+            // console.log("messagezzzzzzzzzzz" + message);
             fnloadPolygon(polygons_CTPRVN, null);
             fnloadPolygon(polygons_SIG, map);
         }

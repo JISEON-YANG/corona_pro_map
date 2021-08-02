@@ -12,11 +12,13 @@ $(document).ready(function() {
     var customOverlay_do;
 
     fnInit();
+
     function fnInit(){
         fnSetMap();
         loadJsonMap("/geo/TL_SCCO_SIG.json", customOverlay_si, polygon_si, polygons_si);
         loadJsonMap("/geo/TL_SCCO_CTPRVN.json", customOverlay_do, polygon_do, polygons_do);
     }
+
     function fnEvent(){
 
     }
