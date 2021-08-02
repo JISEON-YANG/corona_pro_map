@@ -1,4 +1,6 @@
 package com.example.corona_pro_map.publicData;
+import org.json.JSONObject;
+import org.json.XML;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,9 +27,7 @@ public class ApiExplore {
             urlConnection.setRequestMethod("GET");
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"));
-
             String returnLine;
-            result.append("<xmp>");
             while((returnLine = bufferedReader.readLine()) != null) {
                 result.append(returnLine + "\n");
             }
@@ -35,8 +35,11 @@ public class ApiExplore {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        JSONObject jsonObject = XML.toJSONObject(result.toString());
 
-        return result + "</xmp>";
+        System.out.println("jsonObject.toString() = " + jsonObject.toString());
+
+        return jsonObject.toString();
     }
 
 }
