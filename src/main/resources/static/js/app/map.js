@@ -1,34 +1,53 @@
+var map;
+// CTPRVN(도, 시)
+var URL_CTPRVN = "/geo/TL_SCCO_CTPRVN.json";
+var polygons_CTPRVN=[];
+// SIG(시, 군, 구)
+var URL_SIG = "/geo/TL_SCCO_SIG.json";
+var polygons_SIG=[];
+
+var customOverlay;
+
 $(document).ready(function() {
 
-    var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
-    var options = { //지도를 생성할 때 필요한 기본 옵션
-        center: new kakao.maps.LatLng(33.450701, 126.570667), //지도의 중심좌표.
-        level: 3 //지도의 레벨(확대, 축소 정도)
-    };
+    fnInit();
+    function fnInit(){
+        fnSetMap();
+        loadJsonMap(URL_CTPRVN, polygons_CTPRVN);
+        loadJsonMap(URL_SIG, polygons_SIG);
+    }
 
-    var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-    var customOverlay = new kakao.maps.CustomOverlay({});
+    function fnSetMap(){
+        var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+        var options = { //지도를 생성할 때 필요한 기본 옵션
+            center: new kakao.maps.LatLng(37.5693255,126.9838179), //지도의 중심좌표.
+            level: 11 //지도의 레벨(확대, 축소 정도)
+        };
 
-    $.getJSON("/geo/TL_SCCO_SIG.json", function(geojson) {
+        map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+        customOverlay = new kakao.maps.CustomOverlay({});
+    }
 
-        var data = geojson.features;
-        var coordinates = [];    //좌표 저장할 배열
-        var name = '';            //행정 구 이름
-        console.log(data);
-        $.each(data, function(index, val) {
-
-            coordinates = val.geometry.coordinates;
-            name = val.properties.SIG_KOR_NM;
-
-            displayArea(coordinates, name);
-
+    function loadJsonMap(jsonData, polygons){
+        $.getJSON(jsonData, function(geojson) {
+            var data = geojson.features;
+            var coordinates = [];    //좌표 저장할 배열
+            var name = '';            //행정 구 이름
+            console.log(data);
+            $.each(data, function(index, val) {
+                coordinates = val.geometry.coordinates;
+                if(jsonData == URL_CTPRVN){
+                    name = val.properties.CTP_KOR_NM;
+                }else{
+                    name = val.properties.SIG_KOR_NM;
+                }
+                displayArea(coordinates, name, polygons);
+            })
         })
-    })
-
-    var polygons=[];                //function 안 쪽에 지역변수로 넣으니깐 폴리곤 하나 생성할 때마다 배열이 비어서 클릭했을 때 전체를 못 없애줌.  그래서 전역변수로 만듦.
+    }
 
 //행정구역 폴리곤
-    function displayArea(coordinates, name) {
+    function displayArea(coordinates, name, polygons) {
 
         var path = [];            //폴리곤 그려줄 path
         var points = [];        //중심좌표 구하기 위한 지역구 좌표들
@@ -97,6 +116,33 @@ $(document).ready(function() {
         });
     }
 
+    // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+    var zoomControl = new kakao.maps.ZoomControl();
+    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
+    // 지도가 확대 또는 축소되면 마지막 파라미터로 넘어온 함수를 호출하도록 이벤트를 등록합니다
+    kakao.maps.event.addListener(map, 'zoom_changed', function() {
+
+        // 지도의 현재 레벨을 얻어옵니다
+        var level = map.getLevel();
+
+        if(level > 10){
+            var message = '현재 지도 레벨은 ' + level + ' 입니다';
+            console.log("message" + message);
+            fnloadPolygon(polygons_CTPRVN, map);
+            fnloadPolygon(polygons_SIG, null);
+        }else{
+            var message = '현재 지도 레벨은 ' + level + ' 입니다';
+            console.log("messagezzzzzzzzzzz" + message);
+            fnloadPolygon(polygons_CTPRVN, null);
+            fnloadPolygon(polygons_SIG, map);
+        }
+    });
+
+    function fnloadPolygon(polygons, map){
+        $.each(polygons, function(index, value){
+            value.setMap(map);
+        });
+    }
 
 });
