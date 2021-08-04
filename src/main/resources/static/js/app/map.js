@@ -8,13 +8,31 @@ var polygons_SIG=[];
 
 var customOverlay;
 
+var svg = d3.select(".canvas").attr("height",600),
+    margin = { top: 20, right: 20, bottom: 30, left: 40 },
+    x = d3.scaleBand().padding(0.1),
+    y = d3.scaleLinear(),
+    theData = undefined;
+
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
 $(document).ready(function() {
 
     fnInit();
     function fnInit(){
+        fnSetChart();
+
+//        // START!
+//        window.addEventListener("resize", draw);
+
+
+        loadData("제주");
         fnSetMap();
         loadJsonMap(URL_CTPRVN, polygons_CTPRVN);
-        loadJsonMap(URL_SIG, polygons_SIG);
+//        loadJsonMap(URL_SIG, polygons_SIG);
+        draw();
     }
 
     function fnSetMap(){
@@ -104,15 +122,34 @@ $(document).ready(function() {
         // 다각형에 click 이벤트를 등록하고 이벤트가 발생하면 해당 지역 확대을 확대합니다.
         kakao.maps.event.addListener(polygon, 'click', function() {
 
+            $("#localname").text(name);
+            var loadDataParamName = "경기"
+            if(name == "경기도"){
+                loadDataParamName = "경기"
+            }else if(name == "충청북도"){
+                loadDataParamName = "충북"
+            }else if(name == "충청남도"){
+                loadDataParamName = "충남"
+            }else if(name == "강원도"){
+                loadDataParamName = "강원"
+            }else if(name == "경상북도"){
+                loadDataParamName = "경북"
+            }else if(name == "서울특별시"){
+                loadDataParamName = "서울"
+            }else if(name == "제주특별자치도"){
+                loadDataParamName = "제주"
+            }
+
+            loadData(loadDataParamName);
             // 현재 지도 레벨에서 2레벨 확대한 레벨
-            var level = map.getLevel()-2;
+//            var level = map.getLevel()-2;
 
             // 지도를 클릭된 폴리곤의 중앙 위치를 기준으로 확대합니다
-            map.setLevel(level, {anchor: centroid(points), animate: {
-                    duration: 350            //확대 애니메이션 시간
-                }});
+//            map.setLevel(level, {anchor: centroid(points), animate: {
+//                    duration: 350            //확대 애니메이션 시간
+//                }});
 
-            deletePolygon(polygons);                    //폴리곤 제거
+//            deletePolygon(polygons);                    //폴리곤 제거
         });
     }
 
@@ -144,5 +181,101 @@ $(document).ready(function() {
             value.setMap(map);
         });
     }
+    /**
+        d3 chart 생성
+    **/
+    function fnSetChart(){
+     // SETUP
+        g.append("g")
+                .attr("class", "axis axis--x");
+
+        g.append("g")
+                .attr("class", "axis axis--y");
+
+        g.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", "0.71em")
+                .attr("text-anchor", "end")
+                .text("수");
+    }
+
+
+    // DRAWING
+
+    function draw() {
+
+        var bounds = svg.node().getBoundingClientRect(),
+                width = bounds.width - margin.left - margin.right,
+                height = bounds.height - margin.top - margin.bottom;
+
+        x.rangeRound([0, width]);
+        y.rangeRound([height, 0]);
+        g.select(".axis--x")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+
+        g.select(".axis--y")
+                .call(d3.axisLeft(y));
+
+        var bars = g.selectAll(".bar")
+                .data(theData);
+        // ENTER
+        bars
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function (d) { return x(d.stdDay.substring(10,13)); })
+                .attr("y", function (d) { return y(d.defCnt); })
+                .attr("width", x.bandwidth())
+                .attr("height", function (d) { return height - y(d.defCnt); });
+
+        // UPDATE
+        bars.attr("x", function (d) { return x(d.stdDay.substring(10,13)); })
+                .attr("y", function (d) { return y(d.defCnt); })
+                .attr("width", x.bandwidth())
+                .attr("height", function (d) { return height - y(d.defCnt); });
+
+        // EXIT
+        bars.exit()
+                .remove();
+
+    }
+
+    // LOADING DATA
+    var data;
+    function getData(){
+        $.ajax({
+            type: 'GET',
+            url: '/jsonapi',
+            dataType: 'json',
+            contentType:'application/json; charset=utf-8',
+            success: function(obj){
+                data = obj;
+                // console.log(data);
+                loadData(data);
+            }
+        });
+    }
+
+    function loadData(localname) {
+        // d3.json()
+        d3.json("/jsonapi?localname="+localname, function (error, data) {
+            if (error) throw error;
+            theData = data;
+            theData = theData.sort(function(a, b){
+                return a.seq - b.seq;
+            })
+            console.log(theData);
+            x.domain(theData.map(function (d) {
+                    return d.stdDay.substring(10,13);
+            }));
+            y.domain([0, d3.max(theData, function (d) {
+                    console.log(d.defCnt);
+                    return d.defCnt;
+            })]);
+            draw();
+        });
+    }
+
 
 });

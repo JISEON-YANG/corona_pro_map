@@ -2,144 +2,35 @@
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1cf217ec8aafecab4e76cda6322c91b7"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <style>
-    .canvas {width: 100%; height: 100%;}
+    .navi{margin: 50px 0 0 35px;}
+    .title{margin: 0 0 0 35px;}
+    .area{position:relative;width:100%;height:100%;margin:0;padding:0;}
+    #map{float:left;width:40%;height:40%;margin:50px 0 0 50px;padding:0;}
+    .chartArea{float:right;width:60%;height:100%;margin:50px 0 0 0;padding:0;}
+    #localname{height:9%;}
+    #chart{height:90%;}
+    .canvas{width:100%;height:100%;}
+    rect.bar{background-color:#2f4c85;}
 </style>
-<div id="map" style="width:500px;height:400px;"></div>
-<svg class="canvas"></svg>
-<div>
-    <span> hi  test commit</span>
+<div class="navi">
+    <a href="">코로나 지도</a>
+    <a href="">게시판</a>
 </div>
-
+<div class="title">시·도별 코로나 확진자 현황(최신 15일)</div>
+<div class="area">
+    <div id="map" style="width:500px;height:400px;"></div>
+    <div class="chartArea">
+        <span id="localname"></span>
+        <div id="chart"><svg class="canvas"></svg></div>
+    </div>
+</div>
 
 <!--<script type="text/javascript" src="/js/app/map.js"></script>-->
 <!--<script type="text/javascript" src="/js/app/chart.js"></script>-->
 
 <script>
 
-    // SETUP
-
-    var svg = d3.select(".canvas"),
-            margin = { top: 20, right: 20, bottom: 30, left: 40 },
-            x = d3.scaleBand().padding(0.1),
-            y = d3.scaleLinear(),
-            theData = undefined;
-
-    var g = svg.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    g.append("g")
-            .attr("class", "axis axis--x");
-
-    g.append("g")
-            .attr("class", "axis axis--y");
-
-    g.append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", "0.71em")
-            .attr("text-anchor", "end")
-            .text("수");
-
-    // DRAWING
-
-    function draw() {
-
-        var bounds = svg.node().getBoundingClientRect(),
-                width = bounds.width - margin.left - margin.right,
-                height = bounds.height - margin.top - margin.bottom;
-
-        x.rangeRound([0, width]);
-        y.rangeRound([height, 0]);
-
-        g.select(".axis--x")
-                .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x));
-
-        g.select(".axis--y")
-                .call(d3.axisLeft(y).ticks(10, "%"));
-
-        var bars = g.selectAll(".bar")
-                .data(theData);
-        // ENTER
-        bars
-                .enter().append("rect")
-                .attr("class", "bar")
-                .attr("x", function (d) { return x(d.gubun); })
-                .attr("y", function (d) { return y(d.localOccCnt); })
-                .attr("width", x.bandwidth())
-                .attr("height", function (d) { return height - y(d.localOccCnt); });
-
-        // UPDATE
-        bars.attr("x", function (d) { return x(d.gubun); })
-                .attr("y", function (d) { return y(d.localOccCnt); })
-                .attr("width", x.bandwidth())
-                .attr("height", function (d) { return height - y(d.localOccCnt); });
-
-        // EXIT
-        bars.exit()
-                .remove();
-
-    }
-
-    // LOADING DATA
-    var data;
-    function getData(){
-        $.ajax({
-            type: 'GET',
-            url: '/jsonapi',
-            dataType: 'json',
-            contentType:'application/json; charset=utf-8',
-            success: function(obj){
-                data = obj;
-                // console.log(data);
-                loadData(data);
-            }
-        });
-    }
-
-    function loadData(jsonData) {
-        // d3.json()
-        d3.json("/jsonapi", function (error, data) {
-            if (error) throw error;
-            // data.forEach(function(d) {
-            //     if(d.gubun!="검역" && d.gubun!="합계"){
-            //         d.gubun = d.gubun;
-            //         d.localOccCnt = +d.localOccCnt;
-            //     }
-            // });
-            theData = data;
-            x.domain(theData.map(function (d) {
-                if(d.gubun!="검역" && d.gubun!="합계")
-                    return d.gubun;
-            }));
-            y.domain([0, d3.max(theData, function (d) {
-                if(d.gubun!="검역" && d.gubun!="합계")
-                    return d.localOccCnt;
-            })]);
-            draw();
-        });
-        // d3.tsv(tsvFile, function (d) {
-        //     d.frequency = +d.frequency;
-        //     return d;
-        //
-        // }, function (error, data) {
-        //     if (error) throw error;
-        //
-        //     theData = data;
-        //
-        //     x.domain(theData.map(function (d) { return d.letter; }));
-        //     y.domain([0, d3.max(theData, function (d) { return d.frequency; })]);
-        //
-        //     draw();
-        //
-        // });
-    }
-
-    // START!
-
-    window.addEventListener("resize", draw);
     // getData();
-    loadData(data);
 
 </script>
 {{>layout/footer}}
