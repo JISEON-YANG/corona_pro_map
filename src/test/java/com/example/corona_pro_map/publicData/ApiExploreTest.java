@@ -36,16 +36,16 @@ class ApiExploreTest {
                 .build();
     }
 
-
-    @Test
-    public void is_JsonFile() throws Exception {
-        String url = "http://localhost:" + port + "/jsonapi";
-
-        mvc.perform(get(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8"))
-                .andExpect(status().isOk());
-    }
+//
+//    @Test
+//    public void is_JsonFile() throws Exception {
+//        String url = "http://localhost:" + port + "/jsonapi";
+//
+//        mvc.perform(get(url)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .characterEncoding("UTF-8"))
+//                .andExpect(status().isOk());
+//    }
 
 
 
