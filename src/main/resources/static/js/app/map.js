@@ -259,7 +259,7 @@ $(document).ready(function() {
 
     function loadData(localname) {
         // d3.json()
-        d3.json("/jsonapi?localname="+localname, function (error, data) {
+        d3.json("/map/jsonapi?localname="+localname, function (error, data) {
             if (error) throw error;
             theData = data;
             theData = theData.sort(function(a, b){
