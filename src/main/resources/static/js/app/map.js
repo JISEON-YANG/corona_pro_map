@@ -1,9 +1,9 @@
 var map;
 // CTPRVN(도, 시)
-var URL_CTPRVN = "/geo/TL_SCCO_CTPRVN.json";
+var URL_CTPRVN = "/map/geo/TL_SCCO_CTPRVN.json";
 var polygons_CTPRVN=[];
 // SIG(시, 군, 구)
-var URL_SIG = "/geo/TL_SCCO_SIG.json";
+var URL_SIG = "/map/geo/TL_SCCO_SIG.json";
 var polygons_SIG=[];
 
 var customOverlay;
