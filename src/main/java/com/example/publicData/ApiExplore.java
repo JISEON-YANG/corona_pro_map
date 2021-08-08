@@ -1,5 +1,6 @@
-package com.example.corona_pro_map.publicData;
-import org.apache.tomcat.jni.Local;
+package com.example.publicData;
+
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
@@ -7,20 +8,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 @RestController
+@Slf4j
 public class ApiExplore {
 
     @GetMapping("/jsonapi")
@@ -39,7 +37,7 @@ public class ApiExplore {
                     "&pageNo=1" +
                     "&startCreateDt=" + createtDate +
                     "&endCreateDt=" + endDate ;
-            System.out.println("apiUrl = " + apiUrl);
+//            System.out.println("apiUrl = " + apiUrl);
             URL url = new URL(apiUrl);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -55,16 +53,16 @@ public class ApiExplore {
         }
         JSONObject jsonObject = XML.toJSONObject(result.toString());
 //        System.out.println("jsonObject = " + jsonObject.toString());
-        System.out.println("jsonObject = " + jsonObject);
+//        System.out.println("jsonObject = " + jsonObject);
         Object resultCode = jsonObject.getJSONObject("response").getJSONObject("header").get("resultCode");
-//        System.out.println("resultCode = " + resultCode.toString());
+        System.out.println("resultCode = " + resultCode.toString());
         List<String> filterd = new ArrayList<>();
         JSONArray jsonArray = new JSONArray();
         JSONArray itemData;
         
         if(resultCode.toString().equals("00")){
             itemData = jsonObject.getJSONObject("response").getJSONObject("body").getJSONObject("items").getJSONArray("item");
-//            System.out.println("itemData = " + itemData);
+            System.out.println("itemData = " + itemData);
             for(int i =0; i< itemData.length(); i++){
                 JSONObject obj =  itemData.getJSONObject(i);
                 String gubun = obj.getString("gubun");
@@ -76,7 +74,7 @@ public class ApiExplore {
         }else{
             itemData = null;
         }
-        System.out.println(jsonArray.toString());
+//        log.debug(jsonArray.toString());
         return jsonArray.toString();
     }
 

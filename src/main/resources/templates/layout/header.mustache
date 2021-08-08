@@ -27,11 +27,11 @@
         </ul>
         {{#userName}}
             <span id="user" style="color: aliceblue">⭐️ {{userName}}</span>
-            <a href="/logout" class="btn btn-info active" role="button" style="margin-left: 10px">Logout</a>
+            <a href="/map/logout" class="btn btn-info active" role="button" style="margin-left: 10px">Logout</a>
         {{/userName}}
         {{^userName}}
-            <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
-            <a href="/oauth2/authorization/naver" class="btn btn-secondary active" role="button">Naver Login</a>
+            <a href="/map/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
+            <a href="/map/oauth2/authorization/naver" class="btn btn-secondary active" role="button">Naver Login</a>
         {{/userName}}
     </div>
 </nav>
