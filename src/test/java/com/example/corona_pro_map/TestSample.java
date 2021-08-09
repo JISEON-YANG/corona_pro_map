@@ -6,10 +6,10 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest
 public class TestSample {
 
-    @Test
-    public void test_testing(){
-        String a = "test";
-
-        assertThat(a).isEqualTo("test");
-    }
+//    @Test
+//    public void test_testing(){
+//        String a = "test";
+//
+//        assertThat(a).isEqualTo("test");
+//    }
 }
