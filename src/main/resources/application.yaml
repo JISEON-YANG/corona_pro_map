@@ -1,9 +1,11 @@
 spring:
   redis:
-    host: localhost
+    host: session-redis.pxr9ze.ng.0001.apn2.cache.amazonaws.com
     port: 6379
   session:
     store-type: redis
+    redis:
+      flush-mode: on_save
   datasource:
     url: jdbc:mariadb://appleluck-db-dev.cooikna6ekad.ap-northeast-2.rds.amazonaws.com:3306/appleluck
     username: admin
