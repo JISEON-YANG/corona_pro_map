@@ -10,7 +10,7 @@ EXPOSE 8080
 
 # https://docs.docker.com/engine/reference/builder/#add
 # 애플리케이션 파일 추가
-ADD ./build/libs/corona_pro_map-0.1.jar application.jar
+ADD ./build/libs/corona_pro_map-1.0.jar application.jar
 
 # https://docs.docker.com/engine/reference/builder/#entrypoint
 # 실행
