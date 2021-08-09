@@ -23,7 +23,7 @@ spring:
     include: oauth
     active: dev
 server:
-  port: 8081
+  port: 8080
   servlet:
     context-path: /map
 logging.level:
