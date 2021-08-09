@@ -27,13 +27,13 @@ pipeline {
 
         stage('tag'){
             steps{
-                sh 'docker tag map:latest 783845918471.dkr.ecr.ap-northeast-2.amazonaws.com/map:1.0'
+                sh 'docker tag map:latest 783845918471.dkr.ecr.ap-northeast-2.amazonaws.com/map:1.1'
             }
         }
 
         stage('push'){
             steps{
-                sh 'docker push 783845918471.dkr.ecr.ap-northeast-2.amazonaws.com/map:1.0'
+                sh 'docker push 783845918471.dkr.ecr.ap-northeast-2.amazonaws.com/map:1.1'
             }
         }
     }

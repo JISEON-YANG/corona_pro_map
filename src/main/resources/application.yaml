@@ -6,16 +6,16 @@ spring:
   profiles:
     include: oauth
   redis:
-    host: localhost
+    host: session-redis-001.pxr9ze.0001.apn2.cache.amazonaws.com
     port: 6379
     datasource:
-      url: jdbc:mariadb://appleluck-db-dev.cooikna6ekad.ap-northeast-2.rds.amazonaws.com:3306/appleluck
+      url: jdbc:mariadb://acme.appleluck.com:3306/appleluck
       username: admin
       password: Soldesk!
       driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         #        show_sql: true
